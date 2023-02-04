@@ -1,0 +1,85 @@
+FROM st9540808:humble-latest-cuda
+
+# RUN useradd st9540808
+# USER st9540808
+
+# WORKDIR /home/st9540808
+
+RUN pip install --upgrade pip
+
+RUN apt remove python3-gpg -y \
+  && apt-get update \
+  && apt-get install libgpgme-dev swig -y \
+  && pip install gpg
+
+RUN apt install software-properties-common -y \
+  && apt-add-repository ppa:lttng/stable-2.13 \
+  && apt-get update \
+  && apt-get install lttng-tools liblttng-ust-dev -y \
+  && apt-get install python3-babeltrace python3-lttng -y
+
+RUN apt update && apt install -y \
+  build-essential \
+  cmake \
+  git \
+  python3-colcon-common-extensions \
+  python3-flake8 \
+  python3-pip \
+  python3-pytest-cov \
+  python3-rosdep \
+  python3-setuptools \
+  python3-vcstool \
+  python3-bt2 \
+  wget
+
+RUN python3 -m pip install -U \
+  flake8-blind-except \
+  flake8-builtins \
+  flake8-class-newline \
+  flake8-comprehensions \
+  flake8-deprecated \
+  flake8-docstrings \
+  flake8-import-order \
+  flake8-quotes \
+  pytest-repeat \
+  pytest-rerunfailures \
+  pytest \
+  setuptools \
+  colorcet
+
+RUN apt install ros-humble-desktop -y
+RUN apt install -y \
+  ros-humble-ros2trace \
+  ros-humble-ros2trace-analysis \
+  ros-humble-tracetools \
+  ros-humble-tracetools-analysis \
+  ros-humble-tracetools-launch \
+  ros-humble-tracetools-read \
+  ros-humble-tracetools-test \
+  ros-humble-tracetools-trace
+
+RUN apt update && apt install -y \
+  graphviz \
+  graphviz-dev
+
+RUN python3 -m pip install -U \
+  pytest-mock \
+  pybind11 \
+  'pandas>=1.4.0' \
+  bokeh \
+  pandas-bokeh \
+  jupyterlab \
+  graphviz
+
+RUN apt remove python3-distro-info -y \
+  && python3 -m pip install distro-info -U
+
+RUN mkdir -p ~/ros2_caret_ws/src \
+  && wget https://raw.githubusercontent.com/tier4/caret/main/caret.repos \
+  && vcs import ~/ros2_caret_ws/src < caret.repos
+RUN rosdep install \
+  --from-paths ~/ros2_caret_ws/src --ignore-src \
+  --rosdistro humble -y \
+  --skip-keys "console_bridge fastcdr fastrtps rti-connext-dds-5.3.1 urdfdom_headers"
+
+

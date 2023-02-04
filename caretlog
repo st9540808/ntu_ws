@@ -1,0 +1,183 @@
+st9540808@st9540808-i9-13900K:~$ ros2 launch autoware_launch e2e_simulator.launch.xml vehicle_model:=sample_vehicle sensor_model:=awsim_sensor_kit map_path:=./autoware_map/nishishinjuku_autoware_map
+[INFO] [launch]: All log files can be found below /home/st9540808/.ros/log/2023-02-04-05-36-20-273598-st9540808-i9-13900K-4974
+[INFO] [launch]: Default logging verbosity is set to INFO
+[WARNING] [root]: executed command showed stderr output. Command: xacro /home/st9540808/autoware_awsim/install/tier4_vehicle_launch/share/tier4_vehicle_launch/urdf/vehicle.xacro vehicle_model:=sample_vehicle sensor_model:=awsim_sensor_kit config_dir:=/home/st9540808/autoware_awsim/install/awsim_sensor_kit_description/share/awsim_sensor_kit_description/config
+Captured stderr output:
+warning: Using load_yaml() directly is deprecated. Use xacro.load_yaml() instead.
+warning: Using load_yaml() directly is deprecated. Use xacro.load_yaml() instead.
+
+[INFO] [1675460184.036425957] [caret]: trace filtering is enabled.
+[INFO] [1675460184.036442739] [caret]: CARET_IGNORE_NODES: /rviz*
+[INFO] [1675460184.036444608] [caret]: CARET_IGNORE_TOPICS: /clock:/parameter_events
+Error: No session daemon is available
+[INFO] [1675460184.083513204] [caret_trace_4974]: /caret_trace_4974 started
+^C[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[INFO] [component_container_mt-1]: process started with pid [5002]
+[INFO] [robot_state_publisher-2]: process started with pid [5004]
+[INFO] [service_log_checker-3]: process started with pid [5006]
+[INFO] [component_container-4]: process started with pid [5008]
+[INFO] [topic_state_monitor_node-5]: process started with pid [5010]
+[INFO] [topic_state_monitor_node-6]: process started with pid [5012]
+[INFO] [topic_state_monitor_node-7]: process started with pid [5014]
+[INFO] [topic_state_monitor_node-8]: process started with pid [5016]
+[INFO] [topic_state_monitor_node-9]: process started with pid [5018]
+[INFO] [topic_state_monitor_node-10]: process started with pid [5020]
+[INFO] [topic_state_monitor_node-11]: process started with pid [5022]
+[INFO] [topic_state_monitor_node-12]: process started with pid [5024]
+[INFO] [topic_state_monitor_node-13]: process started with pid [5026]
+[INFO] [topic_state_monitor_node-14]: process started with pid [5028]
+[INFO] [topic_state_monitor_node-15]: process started with pid [5030]
+[INFO] [topic_state_monitor_node-16]: process started with pid [5032]
+[INFO] [topic_state_monitor_node-17]: process started with pid [5034]
+[component_container_mt-1] [INFO] [1675460184.316009497] [caret]: trace filtering is enabled.
+[component_container_mt-1] [INFO] [1675460184.316019543] [caret]: CARET_IGNORE_NODES: /rviz*
+[component_container_mt-1] [INFO] [1675460184.316021050] [caret]: CARET_IGNORE_TOPICS: /clock:/parameter_events
+[component_container_mt-1] Error: No session daemon is available
+[component_container_mt-1] [INFO] [1675460184.432759429] [caret_trace_5002]: /caret_trace_5002 started
+[robot_state_publisher-2] [INFO] [1675460184.316223404] [caret]: trace filtering is enabled.
+[robot_state_publisher-2] [INFO] [1675460184.316234479] [caret]: CARET_IGNORE_NODES: /rviz*
+[robot_state_publisher-2] [INFO] [1675460184.316236847] [caret]: CARET_IGNORE_TOPICS: /clock:/parameter_events
+[robot_state_publisher-2] Error: No session daemon is available
+[robot_state_publisher-2] [INFO] [1675460184.403306017] [caret_trace_5004]: /caret_trace_5004 started
+[robot_state_publisher-2] [INFO] [1675460184.410591046] [robot_state_publisher]: got segment base_link
+[robot_state_publisher-2] [INFO] [1675460184.410627936] [robot_state_publisher]: got segment camera0/camera_link
+[robot_state_publisher-2] [INFO] [1675460184.410631550] [robot_state_publisher]: got segment camera0/camera_optical_link
+[robot_state_publisher-2] [INFO] [1675460184.410634055] [robot_state_publisher]: got segment camera1/camera_link
+[robot_state_publisher-2] [INFO] [1675460184.410636316] [robot_state_publisher]: got segment camera1/camera_optical_link
+[robot_state_publisher-2] [INFO] [1675460184.410638507] [robot_state_publisher]: got segment camera2/camera_link
+[robot_state_publisher-2] [INFO] [1675460184.410640579] [robot_state_publisher]: got segment camera2/camera_optical_link
+[robot_state_publisher-2] [INFO] [1675460184.410642728] [robot_state_publisher]: got segment camera3/camera_link
+[robot_state_publisher-2] [INFO] [1675460184.410644960] [robot_state_publisher]: got segment camera3/camera_optical_link
+[robot_state_publisher-2] [INFO] [1675460184.410647084] [robot_state_publisher]: got segment camera4/camera_link
+[robot_state_publisher-2] [INFO] [1675460184.410649118] [robot_state_publisher]: got segment camera4/camera_optical_link
+[robot_state_publisher-2] [INFO] [1675460184.410651209] [robot_state_publisher]: got segment camera5/camera_link
+[robot_state_publisher-2] [INFO] [1675460184.410653340] [robot_state_publisher]: got segment camera5/camera_optical_link
+[robot_state_publisher-2] [INFO] [1675460184.410655420] [robot_state_publisher]: got segment gnss_link
+[robot_state_publisher-2] [INFO] [1675460184.410657597] [robot_state_publisher]: got segment sensor_kit_base_link
+[robot_state_publisher-2] [INFO] [1675460184.410659795] [robot_state_publisher]: got segment tamagawa/imu_link
+[robot_state_publisher-2] [INFO] [1675460184.410661955] [robot_state_publisher]: got segment traffic_light_left_camera/camera_link
+[robot_state_publisher-2] [INFO] [1675460184.410664287] [robot_state_publisher]: got segment traffic_light_left_camera/camera_optical_link
+[robot_state_publisher-2] [INFO] [1675460184.410666348] [robot_state_publisher]: got segment traffic_light_right_camera/camera_link
+[robot_state_publisher-2] [INFO] [1675460184.410668463] [robot_state_publisher]: got segment traffic_light_right_camera/camera_optical_link
+[robot_state_publisher-2] [INFO] [1675460184.410670498] [robot_state_publisher]: got segment velodyne_left
+[robot_state_publisher-2] [INFO] [1675460184.410672702] [robot_state_publisher]: got segment velodyne_left_base_link
+[robot_state_publisher-2] [INFO] [1675460184.410674856] [robot_state_publisher]: got segment velodyne_rear
+[robot_state_publisher-2] [INFO] [1675460184.410676940] [robot_state_publisher]: got segment velodyne_rear_base_link
+[robot_state_publisher-2] [INFO] [1675460184.410679080] [robot_state_publisher]: got segment velodyne_right
+[robot_state_publisher-2] [INFO] [1675460184.410681192] [robot_state_publisher]: got segment velodyne_right_base_link
+[robot_state_publisher-2] [INFO] [1675460184.410683368] [robot_state_publisher]: got segment velodyne_top
+[robot_state_publisher-2] [INFO] [1675460184.410685505] [robot_state_publisher]: got segment velodyne_top_base_link
+[service_log_checker-3] [INFO] [1675460184.330224100] [caret]: trace filtering is enabled.
+[service_log_checker-3] [INFO] [1675460184.330234830] [caret]: CARET_IGNORE_NODES: /rviz*
+[service_log_checker-3] [INFO] [1675460184.330236289] [caret]: CARET_IGNORE_TOPICS: /clock:/parameter_events
+[service_log_checker-3] Error: No session daemon is available
+[service_log_checker-3] [INFO] [1675460184.409263858] [caret_trace_5006]: /caret_trace_5006 started
+[component_container-4] [INFO] [1675460184.316216700] [caret]: trace filtering is enabled.
+[component_container-4] [INFO] [1675460184.316225255] [caret]: CARET_IGNORE_NODES: /rviz*
+[component_container-4] [INFO] [1675460184.316226633] [caret]: CARET_IGNORE_TOPICS: /clock:/parameter_events
+[component_container-4] Error: No session daemon is available
+[component_container-4] [INFO] [1675460184.430604400] [caret_trace_5008]: /caret_trace_5008 started
+[component_container-4] [INFO] [1675460184.592726773] [system.component_state_monitor.container]: Load Library: /home/st9540808/autoware_awsim/install/component_state_monitor/lib/libcomponent_state_monitor.so
+[component_container-4] [INFO] [1675460184.593896348] [system.component_state_monitor.container]: Found class: rclcpp_components::NodeFactoryTemplate<component_state_monitor::StateMonitor>
+[component_container-4] [INFO] [1675460184.593909570] [system.component_state_monitor.container]: Instantiate class: rclcpp_components::NodeFactoryTemplate<component_state_monitor::StateMonitor>
+[topic_state_monitor_node-5] [INFO] [1675460184.316105818] [caret]: trace filtering is enabled.
+[topic_state_monitor_node-5] [INFO] [1675460184.316114576] [caret]: CARET_IGNORE_NODES: /rviz*
+[topic_state_monitor_node-5] [INFO] [1675460184.316116209] [caret]: CARET_IGNORE_TOPICS: /clock:/parameter_events
+[topic_state_monitor_node-5] Error: No session daemon is available
+[topic_state_monitor_node-5] [INFO] [1675460184.411893040] [caret_trace_5010]: /caret_trace_5010 started
+[topic_state_monitor_node-6] [INFO] [1675460184.316663279] [caret]: trace filtering is enabled.
+[topic_state_monitor_node-6] [INFO] [1675460184.316671629] [caret]: CARET_IGNORE_NODES: /rviz*
+[topic_state_monitor_node-6] [INFO] [1675460184.316673113] [caret]: CARET_IGNORE_TOPICS: /clock:/parameter_events
+[topic_state_monitor_node-6] Error: No session daemon is available
+[topic_state_monitor_node-6] [INFO] [1675460184.405734538] [caret_trace_5012]: /caret_trace_5012 started
+[topic_state_monitor_node-7] [INFO] [1675460184.338613504] [caret]: trace filtering is enabled.
+[topic_state_monitor_node-7] [INFO] [1675460184.338631625] [caret]: CARET_IGNORE_NODES: /rviz*
+[topic_state_monitor_node-7] [INFO] [1675460184.338634555] [caret]: CARET_IGNORE_TOPICS: /clock:/parameter_events
+[topic_state_monitor_node-7] Error: No session daemon is available
+[topic_state_monitor_node-7] [INFO] [1675460184.446702308] [caret_trace_5014]: /caret_trace_5014 started
+[topic_state_monitor_node-8] [INFO] [1675460184.361513845] [caret]: trace filtering is enabled.
+[topic_state_monitor_node-8] [INFO] [1675460184.361529468] [caret]: CARET_IGNORE_NODES: /rviz*
+[topic_state_monitor_node-8] [INFO] [1675460184.361532332] [caret]: CARET_IGNORE_TOPICS: /clock:/parameter_events
+[topic_state_monitor_node-8] Error: No session daemon is available
+[topic_state_monitor_node-8] [INFO] [1675460184.452020885] [caret_trace_5016]: /caret_trace_5016 started
+[topic_state_monitor_node-9] [INFO] [1675460184.338876742] [caret]: trace filtering is enabled.
+[topic_state_monitor_node-9] [INFO] [1675460184.338891525] [caret]: CARET_IGNORE_NODES: /rviz*
+[topic_state_monitor_node-9] [INFO] [1675460184.338894175] [caret]: CARET_IGNORE_TOPICS: /clock:/parameter_events
+[topic_state_monitor_node-9] Error: No session daemon is available
+[topic_state_monitor_node-9] [INFO] [1675460184.453125633] [caret_trace_5018]: /caret_trace_5018 started
+[topic_state_monitor_node-10] [INFO] [1675460184.359730374] [caret]: trace filtering is enabled.
+[topic_state_monitor_node-10] [INFO] [1675460184.359740217] [caret]: CARET_IGNORE_NODES: /rviz*
+[topic_state_monitor_node-10] [INFO] [1675460184.359741725] [caret]: CARET_IGNORE_TOPICS: /clock:/parameter_events
+[topic_state_monitor_node-10] Error: No session daemon is available
+[topic_state_monitor_node-10] [INFO] [1675460184.436727467] [caret_trace_5020]: /caret_trace_5020 started
+[topic_state_monitor_node-11] [INFO] [1675460184.364905268] [caret]: trace filtering is enabled.
+[topic_state_monitor_node-11] [INFO] [1675460184.364921090] [caret]: CARET_IGNORE_NODES: /rviz*
+[topic_state_monitor_node-11] [INFO] [1675460184.364924011] [caret]: CARET_IGNORE_TOPICS: /clock:/parameter_events
+[topic_state_monitor_node-11] Error: No session daemon is available
+[topic_state_monitor_node-11] [INFO] [1675460184.459565893] [caret_trace_5022]: /caret_trace_5022 started
+[topic_state_monitor_node-12] [INFO] [1675460184.317303082] [caret]: trace filtering is enabled.
+[topic_state_monitor_node-12] [INFO] [1675460184.317311248] [caret]: CARET_IGNORE_NODES: /rviz*
+[topic_state_monitor_node-12] [INFO] [1675460184.317312742] [caret]: CARET_IGNORE_TOPICS: /clock:/parameter_events
+[topic_state_monitor_node-12] Error: No session daemon is available
+[topic_state_monitor_node-12] [INFO] [1675460184.433314699] [caret_trace_5024]: /caret_trace_5024 started
+[topic_state_monitor_node-13] [INFO] [1675460184.365517633] [caret]: trace filtering is enabled.
+[topic_state_monitor_node-13] [INFO] [1675460184.365533666] [caret]: CARET_IGNORE_NODES: /rviz*
+[topic_state_monitor_node-13] [INFO] [1675460184.365536668] [caret]: CARET_IGNORE_TOPICS: /clock:/parameter_events
+[topic_state_monitor_node-13] Error: No session daemon is available
+[topic_state_monitor_node-13] [INFO] [1675460184.459779610] [caret_trace_5026]: /caret_trace_5026 started
+[topic_state_monitor_node-14] [INFO] [1675460184.325786772] [caret]: trace filtering is enabled.
+[topic_state_monitor_node-14] [INFO] [1675460184.325802234] [caret]: CARET_IGNORE_NODES: /rviz*
+[topic_state_monitor_node-14] [INFO] [1675460184.325805160] [caret]: CARET_IGNORE_TOPICS: /clock:/parameter_events
+[topic_state_monitor_node-14] Error: No session daemon is available
+[topic_state_monitor_node-14] [INFO] [1675460184.427960701] [caret_trace_5028]: /caret_trace_5028 started
+[topic_state_monitor_node-15] [INFO] [1675460184.361458522] [caret]: trace filtering is enabled.
+[topic_state_monitor_node-15] [INFO] [1675460184.361467254] [caret]: CARET_IGNORE_NODES: /rviz*
+[topic_state_monitor_node-15] [INFO] [1675460184.361468751] [caret]: CARET_IGNORE_TOPICS: /clock:/parameter_events
+[topic_state_monitor_node-15] Error: No session daemon is available
+[topic_state_monitor_node-15] [INFO] [1675460184.436963624] [caret_trace_5030]: /caret_trace_5030 started
+[topic_state_monitor_node-16] [INFO] [1675460184.366043277] [caret]: trace filtering is enabled.
+[topic_state_monitor_node-16] [INFO] [1675460184.366058731] [caret]: CARET_IGNORE_NODES: /rviz*
+[topic_state_monitor_node-16] [INFO] [1675460184.366061626] [caret]: CARET_IGNORE_TOPICS: /clock:/parameter_events
+[topic_state_monitor_node-16] Error: No session daemon is available
+[topic_state_monitor_node-16] [INFO] [1675460184.465497814] [caret_trace_5032]: /caret_trace_5032 started
+[topic_state_monitor_node-17] [INFO] [1675460184.319275846] [caret]: trace filtering is enabled.
+[topic_state_monitor_node-17] [INFO] [1675460184.319284123] [caret]: CARET_IGNORE_NODES: /rviz*
+[topic_state_monitor_node-17] [INFO] [1675460184.319285641] [caret]: CARET_IGNORE_TOPICS: /clock:/parameter_events
+[topic_state_monitor_node-17] Error: No session daemon is available
+[topic_state_monitor_node-17] [INFO] [1675460184.418642964] [caret_trace_5034]: /caret_trace_5034 started
+[WARNING] [launch_ros.actions.load_composable_nodes]: Abandoning wait for the '/system/component_state_monitor/container/_container/load_node' service response, due to shutdown.
+^C[WARNING] [launch]: user interrupted with ctrl-c (SIGINT) again, ignoring...
+[topic_state_monitor_node-16] [INFO] [1675460186.115368035] [rclcpp]: signal_handler(signum=2)
+[topic_state_monitor_node-9] [INFO] [1675460186.115371960] [rclcpp]: signal_handler(signum=2)
+[topic_state_monitor_node-6] [INFO] [1675460186.115320565] [rclcpp]: signal_handler(signum=2)
+[topic_state_monitor_node-17] [INFO] [1675460186.115348354] [rclcpp]: signal_handler(signum=2)
+[topic_state_monitor_node-14] [INFO] [1675460186.115346793] [rclcpp]: signal_handler(signum=2)
+[component_container-4] [INFO] [1675460186.115342943] [rclcpp]: signal_handler(signum=2)
+[component_container_mt-1] [INFO] [1675460186.115352729] [rclcpp]: signal_handler(signum=2)
+[topic_state_monitor_node-8] [INFO] [1675460186.115378756] [rclcpp]: signal_handler(signum=2)
+[topic_state_monitor_node-5] [INFO] [1675460186.115378415] [rclcpp]: signal_handler(signum=2)
+[topic_state_monitor_node-12] [INFO] [1675460186.115369899] [rclcpp]: signal_handler(signum=2)
+[service_log_checker-3] [INFO] [1675460186.115385305] [rclcpp]: signal_handler(signum=2)
+[robot_state_publisher-2] [INFO] [1675460186.115385204] [rclcpp]: signal_handler(signum=2)
+[topic_state_monitor_node-13] [INFO] [1675460186.115377665] [rclcpp]: signal_handler(signum=2)
+[topic_state_monitor_node-11] [INFO] [1675460186.115384843] [rclcpp]: signal_handler(signum=2)
+[topic_state_monitor_node-10] [INFO] [1675460186.115395119] [rclcpp]: signal_handler(signum=2)
+[topic_state_monitor_node-7] [INFO] [1675460186.115396482] [rclcpp]: signal_handler(signum=2)
+[topic_state_monitor_node-15] [INFO] [1675460186.116400931] [rclcpp]: signal_handler(signum=2)
+[INFO] [topic_state_monitor_node-16]: process has finished cleanly [pid 5032]
+[INFO] [topic_state_monitor_node-5]: process has finished cleanly [pid 5010]
+[INFO] [topic_state_monitor_node-8]: process has finished cleanly [pid 5016]
+[INFO] [topic_state_monitor_node-14]: process has finished cleanly [pid 5028]
+[INFO] [topic_state_monitor_node-11]: process has finished cleanly [pid 5022]
+[INFO] [component_container_mt-1]: process has finished cleanly [pid 5002]
+[INFO] [topic_state_monitor_node-10]: process has finished cleanly [pid 5020]
+[INFO] [topic_state_monitor_node-12]: process has finished cleanly [pid 5024]
+[INFO] [service_log_checker-3]: process has finished cleanly [pid 5006]
+[INFO] [topic_state_monitor_node-17]: process has finished cleanly [pid 5034]
+[INFO] [robot_state_publisher-2]: process has finished cleanly [pid 5004]
+[INFO] [topic_state_monitor_node-7]: process has finished cleanly [pid 5014]
+[INFO] [topic_state_monitor_node-15]: process has finished cleanly [pid 5030]
+[INFO] [topic_state_monitor_node-13]: process has finished cleanly [pid 5026]
+[INFO] [topic_state_monitor_node-6]: process has finished cleanly [pid 5012]
+[INFO] [topic_state_monitor_node-9]: process has finished cleanly [pid 5018]
+[INFO] [component_container-4]: process has finished cleanly [pid 5008]
