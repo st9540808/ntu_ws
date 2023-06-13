@@ -1,185 +1,91 @@
 #!/usr/bin/python
 #
-# xdp_drop_count.py Drop incoming packets on XDP layer and count for which
-#                   protocol type
+# tc_perf_event.py  Output skb and meta data through perf event
 #
-# Copyright (c) 2016 PLUMgrid
-# Copyright (c) 2016 Jan Ruth
+# Copyright (c) 2016-present, Facebook, Inc.
 # Licensed under the Apache License, Version 2.0 (the "License")
 
 from bcc import BPF
+import ctypes as ct
 import pyroute2
-import time
-import sys
+import socket
 
-flags = 0
-
-
-def usage():
-  print("Usage: {0} [-S] <ifdev>".format(sys.argv[0]))
-  print("       -S: use skb mode\n")
-  print("       -D: use driver mode\n")
-  print("       -H: use hardware offload mode\n")
-  print("e.g.: {0} eth0\n".format(sys.argv[0]))
-  exit(1)
-
-
-if len(sys.argv) < 2 or len(sys.argv) > 3:
-  usage()
-
-offload_device = None
-if len(sys.argv) == 2:
-  device = sys.argv[1]
-elif len(sys.argv) == 3:
-  device = sys.argv[2]
-
-maptype = "percpu_array"
-if len(sys.argv) == 3:
-  if "-S" in sys.argv:
-    # XDP_FLAGS_SKB_MODE
-    flags |= BPF.XDP_FLAGS_SKB_MODE
-  if "-D" in sys.argv:
-    # XDP_FLAGS_DRV_MODE
-    flags |= BPF.XDP_FLAGS_DRV_MODE
-  if "-H" in sys.argv:
-    # XDP_FLAGS_HW_MODE
-    maptype = "array"
-    offload_device = device
-    flags |= BPF.XDP_FLAGS_HW_MODE
-
-# mode = BPF.XDP
-mode = BPF.SCHED_CLS
-
-if mode == BPF.XDP:
-  ret = "XDP_DROP"
-  ctxtype = "xdp_md"
-else:
-  ret = "TC_ACT_SHOT"
-  ctxtype = "__sk_buff"
-
-# load BPF program
-b = BPF(text="""
+bpf_txt = """
+#include <uapi/linux/if_ether.h>
+#include <uapi/linux/in6.h>
+#include <uapi/linux/ipv6.h>
+#include <uapi/linux/pkt_cls.h>
 #include <uapi/linux/bpf.h>
-#include <linux/in.h>
-#include <linux/if_ether.h>
-#include <linux/if_packet.h>
-#include <linux/if_vlan.h>
-#include <linux/ip.h>
-#include <linux/ipv6.h>
 
-typedef struct hist_key {
-    char comm[TASK_COMM_LEN];
-} hist_key_t;
+BPF_PERF_OUTPUT(skb_events);
 
-BPF_HISTOGRAM(dist, hist_key_t);
+struct eth_hdr {
+	unsigned char   h_dest[ETH_ALEN];
+	unsigned char   h_source[ETH_ALEN];
+	unsigned short  h_proto;
+};
 
-BPF_TABLE(MAPTYPE, uint32_t, long, dropcnt, 256);
-
-static inline int parse_ipv4(void *data, u64 nh_off, void *data_end)
+int handle_egress(struct __sk_buff *skb)
 {
-    struct iphdr *iph = data + nh_off;
+	void *data = (void *)(long)skb->data;
+	void *data_end = (void *)(long)skb->data_end;
+	struct eth_hdr *eth = data;
+	struct ipv6hdr *ip6h = data + sizeof(*eth);
+	u32 magic = 0xfaceb00c;
 
-    if ((void*)&iph[1] > data_end)
-        return 0;
-    return iph->protocol;
-}
+	/* single length check */
+	if (data + sizeof(*eth) + sizeof(*ip6h) > data_end)
+		return TC_ACT_OK;
 
-static inline int parse_ipv6(void *data, u64 nh_off, void *data_end)
-{
-    struct ipv6hdr *ip6h = data + nh_off;
+	if (eth->h_proto == htons(ETH_P_IPV6) &&
+	    ip6h->nexthdr == IPPROTO_ICMPV6)
+	        skb_events.perf_submit_skb(skb, skb->len, &magic, sizeof(magic));
 
-    if ((void*)&ip6h[1] > data_end)
-        return 0;
-    return ip6h->nexthdr;
-}
+	return TC_ACT_OK;
+}"""
 
-int xdp_prog1(struct CTXTYPE *ctx)
-{
-    void* data_end = (void*)(long)ctx->data_end;
-    void* data = (void*)(long)ctx->data;
 
-    struct ethhdr *eth = data;
+def print_skb_event(cpu, data, size):
+  class SkbEvent(ct.Structure):
+    _fields_ = [("magic", ct.c_uint32),
+                ("raw", ct.c_ubyte * (size - ct.sizeof(ct.c_uint32)))]
 
-    // drop packets
-    int rc = RETURNCODE; // let pass XDP_PASS or redirect to tx via XDP_TX
-    long *value;
-    uint16_t h_proto;
-    uint64_t nh_off = 0;
-    uint32_t index;
+  skb_event = ct.cast(data, ct.POINTER(SkbEvent)).contents
+  icmp_type = int(skb_event.raw[54])
 
-    nh_off = sizeof(*eth);
+  # Only print for echo request
+  if icmp_type == 128:
+    src_ip = bytes(bytearray(skb_event.raw[22:38]))
+    dst_ip = bytes(bytearray(skb_event.raw[38:54]))
+    print("%-3s %-32s %-12s 0x%08x" %
+          (cpu, socket.inet_ntop(socket.AF_INET6, src_ip),
+           socket.inet_ntop(socket.AF_INET6, dst_ip),
+           skb_event.magic))
 
-    if (data + nh_off  > data_end)
-        return rc;
 
-    h_proto = eth->h_proto;
+try:
+  b = BPF(text=bpf_txt)
+  fn = b.load_func("handle_egress", BPF.SCHED_CLS)
 
-    // parse double vlans
-    #pragma unroll
-    for (int i=0; i<2; i++) {
-        if (h_proto == htons(ETH_P_8021Q) || h_proto == htons(ETH_P_8021AD)) {
-            struct vlan_hdr *vhdr;
+  ipr = pyroute2.IPRoute()
+  ipr.link("add", ifname="me", kind="veth", peer="you")
+  me = ipr.link_lookup(ifname="me")[0]
+  you = ipr.link_lookup(ifname="you")[0]
+  for idx in (me, you):
+    ipr.link('set', index=idx, state='up')
 
-            vhdr = data + nh_off;
-            nh_off += sizeof(struct vlan_hdr);
-            if (data + nh_off > data_end)
-                return rc;
-                h_proto = vhdr->h_vlan_encapsulated_proto;
-        }
-    }
+  ipr.tc("add", "clsact", me)
+  ipr.tc("add-filter", "bpf", me, ":1", fd=fn.fd, name=fn.name,
+         parent="ffff:fff3", classid=1, direct_action=True)
 
-    if (h_proto == htons(ETH_P_IP))
-        index = parse_ipv4(data, nh_off, data_end);
-    else if (h_proto == htons(ETH_P_IPV6))
-       index = parse_ipv6(data, nh_off, data_end);
-    else
-        index = 0;
-
-    value = dropcnt.lookup(&index);
-    if (value)
-        __sync_fetch_and_add(value, 1);
-
-    hist_key_t key = {};
-    bpf_get_current_comm(&key.comm, sizeof(key.comm));
-    dist.increment(key);
-
-    return rc;
-}
-""", cflags=["-w", "-DRETURNCODE=%s" % ret, "-DCTXTYPE=%s" % ctxtype,
-             "-DMAPTYPE=\"%s\"" % maptype],
-        device=offload_device)
-
-fn = b.load_func("xdp_prog1", mode, offload_device)
-
-if mode == BPF.XDP:
-  b.attach_xdp(device, fn, flags)
-else:
-  ip = pyroute2.IPRoute()
-  ipdb = pyroute2.IPDB(nl=ip)
-  idx = ipdb.interfaces[device].index
-  ip.tc("add", "clsact", idx)
-  ip.tc("add-filter", "bpf", idx, ":1", fd=fn.fd, name=fn.name,
-        parent="ffff:fff2", classid=1, direct_action=True)
-
-dropcnt = b.get_table("dropcnt")
-prev = [0] * 256
-print("Printing drops per IP protocol-number, hit CTRL+C to stop")
-while 1:
+  b["skb_events"].open_perf_buffer(print_skb_event)
+  print('Try: "ping6 ff02::1%me"\n')
+  print("%-3s %-32s %-12s %-10s" % ("CPU", "SRC IP", "DST IP", "Magic"))
   try:
-    for k in dropcnt.keys():
-      val = dropcnt[k].value if maptype == "array" else dropcnt.sum(k).value
-      i = k.value
-      if val:
-        delta = val - prev[i]
-        prev[i] = val
-        print("{}: {} pkt/s".format(i, delta))
-    time.sleep(1)
+    while True:
+      b.perf_buffer_poll()
   except KeyboardInterrupt:
-    print("Removing filter from device")
-    break
-
-if mode == BPF.XDP:
-  b.remove_xdp(device, flags)
-else:
-  ip.tc("del", "clsact", idx)
-  ipdb.release()
+    pass
+finally:
+  if "me" in locals():
+    ipr.link("del", index=me)
