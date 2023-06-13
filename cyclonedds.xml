@@ -3,7 +3,7 @@
     <Domain id="any">
       <General>
         <Interfaces>
-          <NetworkInterface name="vlan1@eno2" priority="default" multicast="default" />
+          <NetworkInterface name="eno2.11" priority="default" multicast="default" />
         </Interfaces>
       </General>
     </Domain>
