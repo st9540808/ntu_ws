@@ -3,7 +3,7 @@
 # input parameters
 PIF=${PIF:-eno2} # physical interface name
 VLAN=${VLAN:-10}
-EGRESS_QOS_MAP=${EGRESS_QOS_MAP:-egress-qos-map 0:0 1:1}
+EGRESS_QOS_MAP=${EGRESS_QOS_MAP:-egress-qos-map 2:2 3:3}
 NETMASK=${NETMASK:-192.168}
 IP_SUFFIX=${IP_SUFFIX:-2}
 
