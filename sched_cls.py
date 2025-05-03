@@ -5,6 +5,7 @@
 # Copyright (c) 2016-present, Facebook, Inc.
 # Licensed under the Apache License, Version 2.0 (the "License")
 
+from time import sleep
 from bcc import BPF
 import ctypes as ct
 import pyroute2
@@ -25,67 +26,72 @@ struct eth_hdr {
 	unsigned short  h_proto;
 };
 
-int handle_egress(struct __sk_buff *skb)
+static int handle_egress(struct __sk_buff *skb)
 {
 	void *data = (void *)(long)skb->data;
 	void *data_end = (void *)(long)skb->data_end;
 	struct eth_hdr *eth = data;
 	struct ipv6hdr *ip6h = data + sizeof(*eth);
 	u32 magic = 0xfaceb00c;
+  u32 prio = 1;
+
+
+  // skb->priority = 3;
 
 	/* single length check */
 	if (data + sizeof(*eth) + sizeof(*ip6h) > data_end)
-		return TC_ACT_OK;
+		return TC_ACT_PIPE;
 
-	if (eth->h_proto == htons(ETH_P_IPV6) &&
-	    ip6h->nexthdr == IPPROTO_ICMPV6)
-	        skb_events.perf_submit_skb(skb, skb->len, &magic, sizeof(magic));
+	return TC_ACT_PIPE;
+}
 
-	return TC_ACT_OK;
-}"""
+int handle_egress_dev(struct __sk_buff *skb)
+{
+	bpf_trace_printk("(dev) vlan_tci: %d, priority: %d", skb->vlan_tci, skb->priority);
+	handle_egress(skb);
+}
 
+int handle_egress_dev_vlan(struct __sk_buff *skb)
+{
+	bpf_trace_printk("(dev.vlan) vlan_tci: %d, priority: %d", skb->vlan_tci, skb->priority);
+	handle_egress(skb);
+}
+"""
 
-def print_skb_event(cpu, data, size):
-  class SkbEvent(ct.Structure):
-    _fields_ = [("magic", ct.c_uint32),
-                ("raw", ct.c_ubyte * (size - ct.sizeof(ct.c_uint32)))]
+DEVICE = 'eno2.11'
+DEVICE2 = 'eno2'
 
-  skb_event = ct.cast(data, ct.POINTER(SkbEvent)).contents
-  icmp_type = int(skb_event.raw[54])
+b = BPF(text=bpf_txt)
 
-  # Only print for echo request
-  if icmp_type == 128:
-    src_ip = bytes(bytearray(skb_event.raw[22:38]))
-    dst_ip = bytes(bytearray(skb_event.raw[38:54]))
-    print("%-3s %-32s %-12s 0x%08x" %
-          (cpu, socket.inet_ntop(socket.AF_INET6, src_ip),
-           socket.inet_ntop(socket.AF_INET6, dst_ip),
-           skb_event.magic))
+fn_egress = b.load_func("handle_egress_dev_vlan", BPF.SCHED_CLS)
+fn2_egress = b.load_func("handle_egress_dev", BPF.SCHED_CLS)
 
+ip = pyroute2.IPRoute()
+ipdb = pyroute2.IPDB(nl=ip)
+
+idx = ipdb.interfaces[DEVICE].index
+idx2 = ipdb.interfaces[DEVICE2].index
+
+ip.tc("add", "clsact", idx)
+ip.tc("add", "clsact", idx2)
+
+# add egress clsact
+ip.tc("add-filter", "bpf", idx, ":1", fd=fn_egress.fd, name=fn_egress.name,
+      parent="ffff:fff3", classid=1, direct_action=True)
+ip.tc("add-filter", "bpf", idx2, ":1", fd=fn2_egress.fd, name=fn2_egress.name,
+      parent="ffff:fff3", classid=1, direct_action=True)
+
+# header
+print("Tracing... Ctrl-C to end.")
 
 try:
-  b = BPF(text=bpf_txt)
-  fn = b.load_func("handle_egress", BPF.SCHED_CLS)
+  b.trace_print()
+  while True:
+    sleep(1)
+except KeyboardInterrupt:
+  print('Exiting')
 
-  ipr = pyroute2.IPRoute()
-  ipr.link("add", ifname="me", kind="veth", peer="you")
-  me = ipr.link_lookup(ifname="me")[0]
-  you = ipr.link_lookup(ifname="you")[0]
-  for idx in (me, you):
-    ipr.link('set', index=idx, state='up')
+ip.tc("del", "clsact", idx)
+ip.tc("del", "clsact", idx2)
 
-  ipr.tc("add", "clsact", me)
-  ipr.tc("add-filter", "bpf", me, ":1", fd=fn.fd, name=fn.name,
-         parent="ffff:fff3", classid=1, direct_action=True)
-
-  b["skb_events"].open_perf_buffer(print_skb_event)
-  print('Try: "ping6 ff02::1%me"\n')
-  print("%-3s %-32s %-12s %-10s" % ("CPU", "SRC IP", "DST IP", "Magic"))
-  try:
-    while True:
-      b.perf_buffer_poll()
-  except KeyboardInterrupt:
-    pass
-finally:
-  if "me" in locals():
-    ipr.link("del", index=me)
+ipdb.release()

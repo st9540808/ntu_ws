@@ -1,0 +1,49 @@
+import "experimental/json"
+
+data =
+    from(bucket: "my-bucket")
+        |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+        |> filter(fn: (r) => r["_measurement"] == "spans")
+        |> filter(fn: (r) => r["_field"] == "attributes")
+        |> filter(fn: (r) => r["service.name"] == "dds.traffic")
+
+groupedData =
+    data
+        |> map(
+            fn: (r) => {
+                jsonData = json.parse(data: bytes(v: r._value))
+
+                return {
+                    _measurement: r._measurement,
+                    _time: r._time,
+                    _field: r._field,
+                    _value: jsonData.payload_size,
+                    host_name: jsonData["host.name"],
+                    topic_name: jsonData.topic_name,
+                    sn: jsonData.sn,
+                    writer_id: jsonData.writer_id,
+                    submsg_type: jsonData.submsg_type,
+                    fsn: jsonData.fragment_starting_num,
+                }
+            },
+        )
+        |> sort(columns: ["_time"])
+        |> sort(columns: ["table"])
+        |> group(columns: ["sn", "fsn", "writer_id"])
+
+//     |> unique(column: "sn")
+// groupedData
+min =
+    groupedData
+        |> min(column: "_time")
+
+max =
+    groupedData
+        |> max(column: "_time")
+
+union(tables: [min, max])
+    |> elapsed(unit: 1us)
+    |> group()
+    |> filter(fn: (r) => r.elapsed < 5000)
+    |> drop(columns: ["sn", "fsn", "_value"])
+    |> group(columns: ["topic_name"])

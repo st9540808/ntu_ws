@@ -19,7 +19,7 @@ RUN apt-get update \
 
 RUN git clone https://github.com/tier4/caret.git ros2_caret_ws \
   && cd ros2_caret_ws \
-  && git checkout v0.4.4 \
+  && git checkout main \
   && mkdir src \
   && vcs import src < caret.repos \
   && ./setup_caret.sh -c

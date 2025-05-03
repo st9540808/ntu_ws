@@ -1,10 +1,26 @@
-  <?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
   <CycloneDDS xmlns="https://cdds.io/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://cdds.io/config https://raw.githubusercontent.com/eclipse-cyclonedds/cyclonedds/master/etc/cyclonedds.xsd">
     <Domain id="any">
       <General>
         <Interfaces>
+          <NetworkInterface name="eno2" priority="default" multicast="default" />
           <NetworkInterface name="eno2.11" priority="default" multicast="default" />
+          <NetworkInterface name="eno2.12" priority="default" multicast="default" />
         </Interfaces>
       </General>
+      <Partitioning>
+        <NetworkPartitions>
+          <NetworkPartition Address="239.255.0.2" Interface="eno2.11" Name="pcp2"/>
+          <NetworkPartition Address="239.255.0.3" Interface="eno2.12" Name="pcp3"/>
+        </NetworkPartitions>
+        <PartitionMappings>
+          <!-- <PartitionMapping DCPSPartitionTopic=".rt/topic" NetworkPartition="pcp3"/> -->
+          <PartitionMapping DCPSPartitionTopic=".rt/topic2" NetworkPartition="pcp2"/>
+          <!-- <PartitionMapping DCPSPartitionTopic=".rt/localization/*" NetworkPartition="pcp2"/> -->
+          <PartitionMapping DCPSPartitionTopic=".rt/sensing/lidar/concatenated/pointcloud" NetworkPartition="pcp3"/>
+          <PartitionMapping DCPSPartitionTopic=".rt/sensing/*" NetworkPartition="pcp2"/>
+          <!-- <PartitionMapping DCPSPartitionTopic=".rt/perception/*" NetworkPartition="pcp3"/> -->
+        </PartitionMappings>
+      </Partitioning>
     </Domain>
 </CycloneDDS>

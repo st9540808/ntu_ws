@@ -5,6 +5,7 @@ import ctypes
 # Define BPF program
 BPF_PROGRAM = """
 #include <uapi/linux/ptrace.h>
+#include <uapi/linux/bpf.h>
 
 #include <linux/sched.h>
 #include <linux/types.h>
@@ -24,7 +25,6 @@ typedef struct data {
     char devname[IFNAMSIZ];
 } data_t;
 
-char eno2[] = "eno2";
 BPF_HASH(counts, data_t);
 // BPF_TABLE(avali_devs, dev_t);
 BPF_TABLE("hash", dev_t, u32, avali_devs, 12);
@@ -35,8 +35,26 @@ BPF_TABLE("hash", dev_t, u32, avali_devs, 12);
             bpf_probe_read_str((void *)dst, length, (char *)args + __offset);   \
         } while (0)
 
+static int compare_devname(char *devname) {
+  char tgt[] = "eno2";
+  int size = IFNAMSIZ;
+
+  for (int i = 0; i < (size & 0xff); i++) {
+    if (devname[i] == 0 || tgt[i] == 0) {
+      break;
+    }
+    if (devname[i] != tgt[i]) {
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
 TRACEPOINT_PROBE(net, net_dev_queue) {
+    char eno2[] = "eno2";
     data_t data = {};
+    u32 prio = 1;
 
     struct sk_buff* skb = (struct sk_buff*)args->skbaddr;
 
@@ -48,14 +66,18 @@ TRACEPOINT_PROBE(net, net_dev_queue) {
     bpf_get_current_comm(&data.comm, sizeof(data.comm));
 
     if (skb != NULL) {
-      bpf_trace_printk("dev: %s, %d", data.devname, skb->vlan_tci);
-        // bpf_probe_read_kernel_str(data.devname, sizeof(data.devname), name);
+      // bpf_probe_read_kernel_str(data.devname, sizeof(data.devname), name);
 
-        // if (__builtin_memcmp(data.devname, eno2, sizeof(eno2)) != 0) {
-        //   return 0;
-        // }
+      //bpf_skb_store_bytes(skb, offsetof(struct sk_buff, priority), &prio,
+      //                    sizeof(prio), BPF_F_INVALIDATE_HASH);
+      //skb->priority = 1;
 
-        counts.increment(data);
+      if (compare_devname(data.devname) == 0) {
+        bpf_trace_printk("dev: %s, %d", data.devname, skb->vlan_tci);
+        return 0;
+      }
+
+      counts.increment(data);
     }
     return 0;
 }
@@ -70,26 +92,11 @@ class dev_t(ctypes.Structure):
 # Initialize BPF
 b = BPF(text=BPF_PROGRAM)
 
-# Create a list of dev_t instances
-# devnames = [dev_t(), dev_t()]
-# # Assuming "eth0" is the name of the first device
-# devnames[0].devname = b"eth0"
-# # Assuming "eth1" is the name of the second device
-# devnames[1].devname = b"eth1"
+func_sock_ops = b.load_func("bpf_sockhash", bpf.SOCK_OPS)
+b.attach_func(func_sock_ops, fd, BPFAttachType.CGROUP_SOCK_OPS)
 
-# # Cast them to a ctypes.c_void_p to be compatible with BPF_HASH
-# devnames_p = [ctypes.cast(ctypes.pointer(devname), ctypes.c_void_p)
-#               for devname in devnames]
-
-# # Create a list of initial values
-# initial_values = [ctypes.c_ulonglong(1) for _ in devnames]
-
-# # Update the map
-# b["avali_devs"].items_update_batch(devnames_p, initial_values)
-
-# # Verify they were correctly added
-# for k, v in b["avali_devs"].items():
-#   print("Device name: {}, Value: {}".format(k.devname, v.value))
+# header
+print("Tracing... Ctrl-C to end.")
 
 # Sleep loop
 try:

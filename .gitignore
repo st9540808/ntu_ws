@@ -1,3 +1,16 @@
+.ipynb_checkpoints/
+.ros/
+.vscode/
+autoware/
+CARET_demos/
+docker/
 evaluate/
+grid_map/
 output/
+rosbag*
+test_ws/
 *.log
+
+*.pcap
+*.pcapng
+*.zip
