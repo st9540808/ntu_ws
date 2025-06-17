@@ -12,7 +12,7 @@ PC2_CONTAINER_NAME="autoware_pc2" # Explicit container name for PC2
 REMOTE_PROJECTS_BASE_DIR="/path/on/remote/to/your/projects" # <--- CHANGE THIS !!!
 
 # Rocker specific flags
-ROCKER_FLAGS="--nvidia --x11 --user --privileged --net host"
+ROCKER_FLAGS="--nvidia --x11 --user --privileged --net host --persist-image"
 
 # Rocker image
 ROCKER_IMAGE="st9540808/aw-caret-2023.10-amd64:humble-2404"
@@ -34,7 +34,7 @@ VOLUME_MAPS+=" --volume $REMOTE_PROJECTS_BASE_DIR/autoware_data:\$HOME/autoware_
 
 # Construct the full rocker command for detached execution (--rm removes container on exit)
 # We add '-d' assuming rocker passes it to docker, and specify the keep-alive command.
-DOCKER_RUN_CMD_BASE="rocker $ROCKER_FLAGS $VOLUME_MAPS -- $ROCKER_IMAGE $KEEP_ALIVE_CMD"
+DOCKER_RUN_CMD_BASE="rocker $ROCKER_FLAGS $VOLUME_MAPS -- $ROCKER_IMAGE"
 
 # Add the specific container name for each PC
 DOCKER_RUN_CMD_PC1="$DOCKER_RUN_CMD_BASE"
@@ -96,15 +96,15 @@ run_remote "$PC2_HOST" "
     set -e ;# Exit script if any command fails
     echo 'Starting Docker container (rocker) on PC2...'
     # Use the pre-constructed command variable
-    $DOCKER_RUN_CMD_PC2
-    # echo 'Waiting a moment for container to initialize...'
-    # sleep 8 # Increased wait time slightly for potentially complex startup
-    # echo 'Creating tmux session: $TMUX_SESSION_NAME'
-    # tmux new-session -d -s \"$TMUX_SESSION_NAME\" ;
-    # echo 'Executing launch command in tmux pane 0...'
-    # # Send commands to run inside the container via docker exec within tmux
-    # # Escape $SOURCE_CMD and $LAUNCH_CMD for the remote tmux send-keys context
-    # tmux send-keys -t \"$TMUX_SESSION_NAME:0.0\" 'docker exec -it \"$PC2_CONTAINER_NAME\" /bin/bash' C-m ;
+    $DOCKER_RUN_CMD_PC2 ./ntu_ws/caret2.sh
+    echo 'Waiting a moment for container to initialize...'
+    sleep 8 # Increased wait time slightly for potentially complex startup
+    echo 'Creating tmux session: $TMUX_SESSION_NAME'
+    tmux new-session -d -s \"$TMUX_SESSION_NAME\" ;
+    echo 'Executing launch command in tmux pane 0...'
+    # Send commands to run inside the container via docker exec within tmux
+    Escape $SOURCE_CMD and $LAUNCH_CMD for the remote tmux send-keys context
+    tmux send-keys -t \"$TMUX_SESSION_NAME:0.0\" 'docker exec -it \"$PC2_CONTAINER_NAME\" /bin/bash' C-m ;
     # sleep 2 # Wait for exec to attach
     # tmux send-keys -t \"$TMUX_SESSION_NAME:0.0\" '$(printf "%q" "$SOURCE_CMD")' C-m ;
     # tmux send-keys -t \"$TMUX_SESSION_NAME:0.0\" '$(printf "%q" "$LAUNCH_CMD")' C-m ;
